@@ -14,15 +14,18 @@ void dodaj(char t[][31], int x2, int y2);
 void clear( queue<int> &q );
 void losuj (char t[][31], int x, int y);
 void wypisz(int x, int y, char t[][31]);
-int menu (int ilosc_gier=0), menu2();
-int celx, cely, punkty;
+int wybierzOpcje(int ile);
+int wypiszMenu(int co);
+int wyswietlWyniki();
+int zapiszWynik(int gdzieZapisac);
+int menu (int gdzieZapisac);
+int celx, cely, punkty, poGrze=0;
 
 int main()
 {
     int predkosc, x=15, y=31;
-    if (!(predkosc=menu())) return 0;
 
-    do
+    while(predkosc=menu(predkosc))
     {
         punkty=-1;
         int ax = x/2, ay = y/2+1;
@@ -70,9 +73,9 @@ int main()
         wypisz (x, y, tab);                                                    // wypisanie mapy i weza
     }
     wyjscie:
-    system( "cls" );
-    cout << "Przegrales. Liczba zdobytych punktow: " << punkty << endl;
-    }while ((predkosc=menu2()));
+    system("cls");
+    poGrze=1;
+    }
     return 0;
 }
 
@@ -89,7 +92,7 @@ void wypisz(int x, int y, char t[][31])
         }
 }
 
-void dodaj(char t[][31], int x2, int y2)                               // dodanie liczb do kolejki
+/*void dodaj(char t[][31], int x2, int y2)                               // dodanie liczb do kolejki
 {
     t[x2][y2]='o';
 
@@ -114,7 +117,7 @@ void dodaj(char t[][31], int x2, int y2)                               // dodani
     dane2.push(y2);
     ile=punkty;
 }
-
+*/
 void clear( queue<int> &q )
 {
    queue<int> empty;
@@ -127,120 +130,184 @@ void losuj (char t[][31], int x, int y)
         {
             celx = rand()%(x-2)+1; cely = (rand()%((y/2)-1))*2+2;
         }while (t[celx][cely]=='x' || t[celx][cely]=='o');
+
         t[celx][cely]= '*';
     }
 
-int menu(int ilosc_gier)
+int wypiszMenu(int co)
+{
+    if (co!=3 && co!=2) system( "cls" );
+    if (co==0)
     {
-        int poziom=-1;
-        //static bool ilosc_gier;
-        do
+        cout << "Witaj w grze WUNSZ! \n"
+            "1. Chce grac!\n"
+            "2. Ranking wynikow \n"
+            "\n"
+            "0. Wyjscie\n" << endl;
+        return 2;
+    }
+    else if (co==1)
+    {
+        cout << "Wybierz poziom trudnosci:\n"
+            "1. Latwy \n"
+            "2. Sredni \n"
+            "3. Trudny \n"
+            "4. Extremalnie trudny! \n"
+            "\n"
+            "0. Cofnij\n" << endl;
+        return 4;
+    }
+    else if (co==2)
+    {
+        cout << "1. Chce grac ponownie!\n"
+            "2. Zapisz swoj wynik.\n"
+            "\n"
+            "0. Wyjscie\n" << endl;
+        return 2;
+    }
+    else if (co==3)
+    {
+        cout << "\n"
+                "0. Cofnij\n" << endl;
+        return 0;
+    }
+
+}
+int wybierzOpcje(int ile)
+{
+    char wyb;
+    do
+    {
+        wyb=getch();
+        if(wyb<48 || wyb>(48+ile))
         {
-            char wyb;
-            if (!ilosc_gier)
-            {
-                cout << "Witaj w grze WUNSZ! \n1. Chce grac!\n2. Ranking wynikow \n\n0. Wyjscie\n" << endl;
-                wyb=getch();
-            }
-            else if (ilosc_gier)  wyb='1';
-
-            if (wyb=='1')
-            {
-                system( "cls" );
-                cout << "Wybierz poziom trudnosci: \n1. Latwy \n2. Sredni \n3. Trudny \n4. Extremalnie trudny! \n\n0. Cofnij\n\n";
-                char wyb;
-                do
-                {
-                    wyb=getch();
-                }while(wyb>'4' || wyb<'0');
-                if      (wyb=='1') poziom=20;
-                else if (wyb=='2') poziom=10;
-                else if (wyb=='3') poziom=4;
-                else if (wyb=='4') poziom=2;
-                else if (wyb=='0') {poziom=-1; system( "cls" );}
-            }
-            else if (wyb=='2')
-            {
-                system( "cls" );
-                string linia, imie;
-                int nr_linii=1, punkty;
-
-                fstream plik;
-                plik.open("ranking.txt", ios::in);
-
-                if(plik.good()==false) {cout<<"Nie mozna otworzyc pliku!"; Sleep( 1000 );system( "cls" ); }
-                cout << "Najlepsze wyniki:" << endl;
-
-                while (getline(plik, linia))
-                {
-                    switch (nr_linii)
-                    {
-                        case 1: imie=linia; break;
-                        case 2: punkty=atoi(linia.c_str()); break;
-                    }
-                nr_linii++;
-
-                }
-                cout<<"Pseudonim: "<<imie<< " Punkty: " << punkty << endl;
-
-                while (1)
-                {
-                    cout << "\n0. Powrot do menu glownego." << endl;
-                    wyb=getch();
-                    if (wyb=='0') {system( "cls" ); return menu(0);}
-                    else {cout << "Nie ma takiej opcji! Jeszcze raz!"; Sleep( 1000 );system( "cls" );}
-                }
-            }
-            else if (wyb=='0') poziom=0;
-            else {cout << "Nie ma takiej opcji! Jeszcze raz!"; Sleep( 1000 );system( "cls" );}
-            ilosc_gier=0;
-       }while(poziom<0);
+            cout << "Nie ma takiej opcji! Jeszcze raz!";
+            Sleep( 1000 );
+            cout << "\r                                         \r";
+        }
+    }while(wyb<48 || wyb>(48+ile));
+    return ((int)wyb)-48;
+}
 
 
-        return poziom;
-    }
-
-int menu2()
+int menu(int gdzieZapisac)
+{
+    int poziom=-1;
+    do
     {
-       while (1)
-       {
-       cout  << "1. Chce grac ponownie!\n2. Zapisz swoj wynik.\n\n0. Wyjscie.\n";
-       char wyb = getch();
-       if (wyb=='1') return menu(1);
-       else if (wyb=='2')
-       {
-            string imie;
-            cout << "Aby zapisac wynik podaj swoj pseudonim" << endl;
-            cin>> imie;
-            fstream plik;
-            plik.open("ranking.txt",ios::out);
+        int wyb;
+        if (!poGrze)
+        {
+            wyb = wybierzOpcje(wypiszMenu(0));
+        }
+        else if (poGrze)
+        {
+            cout << "Przegrales. Liczba zdobytych punktow: " << punkty << endl;
+            wyb = wybierzOpcje(wypiszMenu(2));
+            if (wyb==2)
+                {zapiszWynik(gdzieZapisac); wyb = wybierzOpcje(wypiszMenu(0));}
+        }
 
-            plik<<imie<<endl;
-            plik<<punkty<<endl;
+        if (wyb==1)
+        {
+            wyb = wybierzOpcje(wypiszMenu(1));
+            if      (wyb==1) poziom=20;
+            else if (wyb==2) poziom=10;
+            else if (wyb==3) poziom=4;
+            else if (wyb==4) poziom=2;
+            else if (wyb==0) {poziom=-1; system( "cls" );}
+        }
+        else if (wyb==2)
+        {
+            wyswietlWyniki();
+        }
+        else if (wyb==0) poziom=0;
 
-            plik.close();
+        poGrze=0;
+    }while(poziom<0);
 
-            system( "cls" );
+return poziom;
+}
 
-            while (1)
+int wyswietlWyniki()
+{
+    int wyb;
+    system( "cls" );
+    string linia, imie, tekst;
+    int nr_linii=0, punkty;
+
+    fstream plik;
+
+    cout << "Najlepsze wyniki:" << endl;
+    for (int i=0; i<4; i++)
+    {
+        if      (i==0) {plik.open("rankingLatwy.txt",    ios::in); tekst = "Latwy";}
+        else if (i==1) {plik.open("rankingSredni.txt",   ios::in); tekst = "Sredni";}
+        else if (i==2) {plik.open("rankingTrudny.txt",   ios::in); tekst = "Trundy";}
+        else if (i==3) {plik.open("rankingExtreme.txt",  ios::in); tekst = "Extremalnie trudny";}
+
+
+    if(plik.good()==false) {cout<<"Nie mozna otworzyc pliku!"<<endl; Sleep( 1000 ); }
+    else
+    {
+
+        cout << "\n\t" << tekst<< endl;
+        cout<<"Pseudonim: \t\tPunkty: " << endl;
+        while(getline(plik, linia))
+        {
+
+            switch (nr_linii%2)
             {
-            cout << "Zapisano.\n\n0. Powrot do menu glownego." << endl;
-            wyb=getch();
-            if (wyb=='0') {system( "cls" ); return menu(0);}
-            else {cout << "Nie ma takiej opcji! Jeszcze raz!"; Sleep( 1000 );system( "cls" );}
+                case 0: imie=linia;                 cout<<imie<<" \t\t\t"; break;
+                case 1: punkty=atoi(linia.c_str()); cout<< punkty << endl; break;
             }
-       }
-       else if (wyb=='0') return 0;
-       else {cout << "Nie ma takiej opcji! Jeszcze raz!"; Sleep( 1000 );system( "cls" );}
-       }
+            nr_linii++;
+        }
     }
+    plik.close();
+    }
+    cout << endl;
+    return wybierzOpcje(wypiszMenu(3));
+}
 
+int zapiszWynik(int gdzieZapisac)
+{
+    int wyb;
+    string imie;
 
-/*void dodaj(char t[][31], int x2, int y2, int punkty)    //  STARA WERSJA dodanie liczb do kolejki
+    cout << "Aby zapisac wynik podaj swoj pseudonim" << endl;
+    cin>> imie;
+
+    fstream plik;
+    switch (gdzieZapisac)
+    {
+        case 20: plik.open("rankingLatwy.txt",ios::app ); break;
+        case 10: plik.open("rankingSredni.txt",ios::app ); break;
+        case 4:  plik.open("rankingTrudny.txt",ios::app ); break;
+        case 2:  plik.open("rankingExtreme.txt",ios::app ); break;
+        //default:
+    }
+    //plik.open("ranking.txt",ios::app );
+    //if(plik.good()==false) {cout<<"Nie mozna zapisaæ!"; Sleep( 1000 );system( "cls" ); }
+
+    plik<<imie<<endl;
+    plik<<punkty<<endl;
+
+    plik.close();
+
+    system( "cls" );
+    cout << "Zapisano." <<endl;
+    return wybierzOpcje(wypiszMenu(3));
+}
+
+void dodaj(char t[][31], int x2, int y2)    //  STARA WERSJA dodanie liczb do kolejki
 {
     t[x2][y2]='o';
-
-    static int ile=1; dane1[196], dane2[196];
+    if (punkty == -1)
+    {
+        punkty = 0;
+    }
+    static int ile=1, dane1[196], dane2[196];
 
     if (ile>=punkty)                                                               // jesli kolejka pelna - usuniecie
     {
@@ -252,4 +319,4 @@ int menu2()
     }
     dane1[punkty] = x2;    dane2[punkty] = y2;
     ile=punkty;
-}*/
+}
