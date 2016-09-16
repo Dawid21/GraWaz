@@ -11,7 +11,6 @@
 using namespace std;
 
 void dodaj(char t[][31], int x2, int y2);
-void clear( queue<int> &q );
 void losuj (char t[][31], int x, int y);
 void wypisz(int x, int y, char t[][31]);
 int wybierzOpcje(int ile);
@@ -92,7 +91,7 @@ void wypisz(int x, int y, char t[][31])
         }
 }
 
-/*void dodaj(char t[][31], int x2, int y2)                               // dodanie liczb do kolejki
+void dodaj(char t[][31], int x2, int y2)                               // dodanie liczb do kolejki
 {
     t[x2][y2]='o';
 
@@ -102,9 +101,8 @@ void wypisz(int x, int y, char t[][31])
 
     if (punkty == -1)
     {
-        clear( dane1 );
-        cout << "aaaa";
-        clear( dane2 );
+        while (dane1.size()>0)     dane1.pop();
+        while (dane2.size()>0)     dane2.pop();
         punkty = 0;
     }
 
@@ -117,12 +115,7 @@ void wypisz(int x, int y, char t[][31])
     dane2.push(y2);
     ile=punkty;
 }
-*/
-void clear( queue<int> &q )
-{
-   queue<int> empty;
-   swap( q, empty );
-}
+
 void losuj (char t[][31], int x, int y)
     {
         srand(time(NULL));
@@ -152,7 +145,7 @@ int wypiszMenu(int co)
             "1. Latwy \n"
             "2. Sredni \n"
             "3. Trudny \n"
-            "4. Extremalnie trudny! \n"
+            "4. Ekstremalnie trudny! \n"
             "\n"
             "0. Cofnij\n" << endl;
         return 4;
@@ -244,10 +237,10 @@ int wyswietlWyniki()
         if      (i==0) {plik.open("rankingLatwy.txt",    ios::in); tekst = "Latwy";}
         else if (i==1) {plik.open("rankingSredni.txt",   ios::in); tekst = "Sredni";}
         else if (i==2) {plik.open("rankingTrudny.txt",   ios::in); tekst = "Trundy";}
-        else if (i==3) {plik.open("rankingExtreme.txt",  ios::in); tekst = "Extremalnie trudny";}
+        else if (i==3) {plik.open("rankingExtreme.txt",  ios::in); tekst = "Ekstremalnie trudny";}
 
 
-    if(plik.good()==false) {cout<<"Nie mozna otworzyc pliku!"<<endl; Sleep( 1000 ); }
+    if(plik.good()==false) {cout<<"Nie mozna otworzyc pliku: ranking"<<(tekst=="Ekstremalnie trudny" ? "Extreme" : tekst)<<".txt."<<endl; Sleep( 1000 ); }
     else
     {
 
@@ -285,10 +278,7 @@ int zapiszWynik(int gdzieZapisac)
         case 10: plik.open("rankingSredni.txt",ios::app ); break;
         case 4:  plik.open("rankingTrudny.txt",ios::app ); break;
         case 2:  plik.open("rankingExtreme.txt",ios::app ); break;
-        //default:
     }
-    //plik.open("ranking.txt",ios::app );
-    //if(plik.good()==false) {cout<<"Nie mozna zapisaæ!"; Sleep( 1000 );system( "cls" ); }
 
     plik<<imie<<endl;
     plik<<punkty<<endl;
@@ -300,7 +290,7 @@ int zapiszWynik(int gdzieZapisac)
     return wybierzOpcje(wypiszMenu(3));
 }
 
-void dodaj(char t[][31], int x2, int y2)    //  STARA WERSJA dodanie liczb do kolejki
+/*void dodaj(char t[][31], int x2, int y2)    //  STARA WERSJA dodanie liczb do kolejki
 {
     t[x2][y2]='o';
     if (punkty == -1)
@@ -320,3 +310,4 @@ void dodaj(char t[][31], int x2, int y2)    //  STARA WERSJA dodanie liczb do ko
     dane1[punkty] = x2;    dane2[punkty] = y2;
     ile=punkty;
 }
+*/
