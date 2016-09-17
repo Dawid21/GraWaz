@@ -10,75 +10,81 @@
 
 using namespace std;
 
-void dodaj(char t[][31], int x2, int y2);
-void losuj (char t[][31], int x, int y);
-void wypisz(int x, int y, char t[][31]);
+void dodaj(vector<string> &t, int x2, int y2);
+void losuj (vector<string> &t, int x, int y);
+void wypisz(int x, int y, vector<string> &t);
 int wybierzOpcje(int ile);
 int wypiszMenu(int co);
 int wyswietlWyniki();
+void opcje();
 int zapiszWynik(int gdzieZapisac);
 int menu (int gdzieZapisac);
-int celx, cely, punkty, poGrze=0;
+int celx, cely, punkty, poGrze=0, x=15, y=31;
 
 int main()
 {
-    int predkosc, x=15, y=31;
+    int predkosc;
 
     while(predkosc=menu(predkosc))
     {
         punkty=-1;
         int ax = x/2, ay = y/2+1;
-        char tab [15][31]={};
+
+        vector <string> tab;
+        tab.resize(x, string (y, ' '));
+
         tab[0][0]='/'; tab[x-1][y-1]='/'; tab[0][y-1]='\\'; tab[x-1][0]='\\';
         for (int i=1; i<y-1; i++)   {tab[0][i]='=';  tab[x-1][i]='=';}                    // krawedzie mapy - gora, dol
         for (int i=1; i<x-1; i++)   {tab[i][0]='|';  tab[i][y-1]='|';}                    // krawedzie mapy - lewa, prawa
         tab[ax][ay]='x';
+
         losuj(tab, x, y);                                                                 // losuje polozenie 1. celu
         dodaj(tab, ax, ay-2);
         wypisz(x, y, tab);                                                        // wypisanie mapy i weza
 
         char znak='d', znak_por=znak;
-    while(1)
-    {
-        int timer = predkosc ;
-        while( timer> 0 )
+
+        while(1)
         {
-            if(kbhit())
+            int timer = predkosc ;
+            while( timer> 0 )
             {
-                znak_por= getch();                                              // pobranie znaku sterujacego
+                if(kbhit())
+                {
+                    znak_por= tolower(getch());                                              // pobranie znaku sterujacego
+                }
+                Sleep( 5 ); timer--;
             }
-            Sleep( 5 ); timer--;
+            if (znak_por=='d' && znak!='a') znak=znak_por;
+            if (znak_por=='a' && znak!='d') znak=znak_por;
+            if (znak_por=='w' && znak!='s') znak=znak_por;
+            if (znak_por=='s' && znak!='w') znak=znak_por;
+
+            switch (znak)                                                                 // switch sterujacy
+            {
+                case 'w':
+                    { ax--;   WARUNEK_ZBICIA; tab[ax][ay]='x';  dodaj(tab, ax+1, ay); break;}
+                case 's':
+                    { ax++;   WARUNEK_ZBICIA; tab[ax][ay]='x';  dodaj(tab, ax-1, ay); break;}
+                case 'a':
+                    { ay-=2;  WARUNEK_ZBICIA; tab[ax][ay]='x';  dodaj(tab, ax, ay+2); break;}
+                case 'd':
+                    { ay+=2;  WARUNEK_ZBICIA; tab[ax][ay]='x';  dodaj(tab, ax, ay-2); break;}
+                default: break;
+            }
+
+            if (tab[ax][ay]==tab[celx][cely]) { punkty++; losuj (tab, x, y ); }            // losowanie  celu i punkt
+
+            wypisz (x, y, tab);                                                    // wypisanie mapy i weza
         }
-        if (znak_por=='d' && znak!='a') znak=znak_por;
-        if (znak_por=='a' && znak!='d') znak=znak_por;
-        if (znak_por=='w' && znak!='s') znak=znak_por;
-        if (znak_por=='s' && znak!='w') znak=znak_por;
-
-        switch (znak)                                                                 // switch sterujacy
-        {
-            case 'w':
-                { ax--;   WARUNEK_ZBICIA; tab[ax][ay]='x';  dodaj(tab, ax+1, ay); break;}
-            case 's':
-                { ax++;   WARUNEK_ZBICIA; tab[ax][ay]='x';  dodaj(tab, ax-1, ay); break;}
-            case 'a':
-                { ay-=2;  WARUNEK_ZBICIA; tab[ax][ay]='x';  dodaj(tab, ax, ay+2); break;}
-            case 'd':
-                { ay+=2;  WARUNEK_ZBICIA; tab[ax][ay]='x';  dodaj(tab, ax, ay-2); break;}
-            default: break;
-        }
-
-        if (tab[ax][ay]==tab[celx][cely]) { punkty++; losuj (tab, x, y ); }            // losowanie  celu i punkt
-
-        wypisz (x, y, tab);                                                    // wypisanie mapy i weza
-    }
-    wyjscie:
-    system("cls");
-    poGrze=1;
+        wyjscie:
+        system("cls");
+        poGrze=1;
     }
     return 0;
 }
 
-void wypisz(int x, int y, char t[][31])
+void wypisz(int x, int y, vector<string> &t)
 {
     system( "cls" );
     cout <<"Gra zostala skompilowana: " << __DATE__ << " o godzinie: " << __TIME__ << endl;
@@ -91,7 +97,7 @@ void wypisz(int x, int y, char t[][31])
         }
 }
 
-void dodaj(char t[][31], int x2, int y2)                               // dodanie liczb do kolejki
+void dodaj(vector<string> &t, int x2, int y2)                               // dodanie liczb do kolejki
 {
     t[x2][y2]='o';
 
@@ -103,7 +109,7 @@ void dodaj(char t[][31], int x2, int y2)                               // dodani
     {
         while (dane1.size()>0)     dane1.pop();
         while (dane2.size()>0)     dane2.pop();
-        punkty = 0;
+        punkty = 0; ile=1;
     }
 
     if (ile==punkty)                                                               // jesli kolejka pelna - usuniecie
@@ -116,16 +122,16 @@ void dodaj(char t[][31], int x2, int y2)                               // dodani
     ile=punkty;
 }
 
-void losuj (char t[][31], int x, int y)
+void losuj (vector<string> &t, int x, int y)
+{
+    srand(time(NULL));
+    do
     {
-        srand(time(NULL));
-        do
-        {
-            celx = rand()%(x-2)+1; cely = (rand()%((y/2)-1))*2+2;
-        }while (t[celx][cely]=='x' || t[celx][cely]=='o');
+        celx = rand()%(x-2)+1; cely = (rand()%((y/2)-1))*2+2;
+    }while (t[celx][cely]=='x' || t[celx][cely]=='o');
 
-        t[celx][cely]= '*';
-    }
+    t[celx][cely]= '*';
+}
 
 int wypiszMenu(int co)
 {
@@ -135,9 +141,10 @@ int wypiszMenu(int co)
         cout << "Witaj w grze WUNSZ! \n"
             "1. Chce grac!\n"
             "2. Ranking wynikow \n"
+            "3. Opcje \n"
             "\n"
             "0. Wyjscie\n" << endl;
-        return 2;
+        return 3;
     }
     else if (co==1)
     {
@@ -154,17 +161,30 @@ int wypiszMenu(int co)
     {
         cout << "1. Chce grac ponownie!\n"
             "2. Zapisz swoj wynik.\n"
+            "3. Opcje \n"
             "\n"
             "0. Wyjscie\n" << endl;
-        return 2;
+        return 3;
     }
     else if (co==3)
     {
         cout << "\n"
-                "0. Cofnij\n" << endl;
+            "0. Cofnij\n" << endl;
         return 0;
     }
+    else if (co==4)
+    {
+        cout << "Zmien rozmiar mapy. \n"
+            "Uwaga! Dla niestandarowego rozmiaru wyniki nie beda zapisywane! \n"
+            "1. Mala mapa \n"
+            "2. Standardowa mapa \n"
+            "3. Duza mapa \n"
+            "4. Bardzo duza mapa \n"
 
+            "\n"
+            "0. Cofnij\n" << endl;
+        return 4;
+    }
 }
 int wybierzOpcje(int ile)
 {
@@ -198,7 +218,11 @@ int menu(int gdzieZapisac)
             cout << "Przegrales. Liczba zdobytych punktow: " << punkty << endl;
             wyb = wybierzOpcje(wypiszMenu(2));
             if (wyb==2)
-                {zapiszWynik(gdzieZapisac); wyb = wybierzOpcje(wypiszMenu(0));}
+                {
+                    if (x==15 && y==31) {zapiszWynik(gdzieZapisac); }
+                    else { system ("cls");cout << "Niestandardowy rozmiar mapy! \n \nNie mozna zapisac!"; wybierzOpcje(wypiszMenu(3));}
+                    wyb = wybierzOpcje(wypiszMenu(0));
+                }
         }
 
         if (wyb==1)
@@ -213,6 +237,10 @@ int menu(int gdzieZapisac)
         else if (wyb==2)
         {
             wyswietlWyniki();
+        }
+        else if (wyb==3)
+        {
+            opcje();
         }
         else if (wyb==0) poziom=0;
 
@@ -290,24 +318,15 @@ int zapiszWynik(int gdzieZapisac)
     return wybierzOpcje(wypiszMenu(3));
 }
 
-/*void dodaj(char t[][31], int x2, int y2)    //  STARA WERSJA dodanie liczb do kolejki
+void opcje()
 {
-    t[x2][y2]='o';
-    if (punkty == -1)
+    int wyb = wybierzOpcje(wypiszMenu(4));
+    switch (wyb)
     {
-        punkty = 0;
+        case 1: x = 7; y = 15; break;
+        case 2: x = 15; y = 31; break;
+        case 3: x = 19; y = 39; break;
+        case 4: x = 25; y = 51; break;
+        case 0: break;
     }
-    static int ile=1, dane1[196], dane2[196];
-
-    if (ile>=punkty)                                                               // jesli kolejka pelna - usuniecie
-    {
-        if (ile == punkty) t[dane1[0]][dane2[0]] = ' ';
-        for (int i= 0; i<=punkty; i++)
-        {
-            dane1[i]=dane1[i+1];    dane2[i]=dane2[i+1];
-        }
-    }
-    dane1[punkty] = x2;    dane2[punkty] = y2;
-    ile=punkty;
 }
-*/
